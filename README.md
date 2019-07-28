@@ -1,6 +1,6 @@
-# Monte Carlo Localization - Simulator
+# EKF Localization - Simulator
 
-In this repository you find a simulation of a robot localization algorithm based on a *Particle Filter*. The simulator comes with a GUI that allows for exploring the performance of the algorithm under different parameter settings. The project is inspired by the course *Applied Estimation* at *KTH Royal Institute of Technology, Stockholm*.
+In this repository you find a simulation of a robot localization algorithm based on an *Extended Kalman Filter* (EKF). The simulator comes with a GUI that allows for exploring the performance of the algorithm under different parameter settings. The project is inspired by the course *Applied Estimation* at *KTH Royal Institute of Technology, Stockholm*.
 
 <p align="center"> 
 <img height="400px" src="/images/simulator_gui.png">
@@ -8,7 +8,7 @@ In this repository you find a simulation of a robot localization algorithm based
 
 ## Implementation Details
 
-The motivation behind the development of this simulator is to create an intuitive understanding of the Particle Filter and how it is applied in the context of robot localization. This is facilitated by allowing for altering filter parameters during the localization and being able to observe the effect on the algorithm's performance directly. Furthermore, by providing characteristically different datasets, a wide range of localization scenarios can be explored.
+The motivation behind the development of this simulator is to create an intuitive understanding of the EKF and how it is applied in the context of robot localization. This is facilitated by allowing for altering filter parameters during the localization and being able to observe the effect on the algorithm's performance directly. Furthermore, by providing characteristically different datasets, a wide range of localization scenarios can be explored.
 
 ### Sensor Data
 
@@ -16,18 +16,16 @@ The robot localization is performed on simulated sensor data. The data includes 
 
 ### Simulation Settings
 
-In order to explore the full capabilities of the particle filter, different simulation modes exist along with a wide range of parameters can be adapted during the simulation.
+In order to explore the full capabilities of the EKF, characteristically different and challenging datasets are used which require a wide range of parameter settings to accurately track the robot's trajectory.
 
 #### Simulation Mode
-* **Tracking:** The Particle Filter is initialized to the position of the robot at the start of the simulation and the task is to accurately track the trajectory of the robot.
-* **Global Localization:** The Particle Filter is unaware of the robot's initial position and is tasked with locating the robot in the environment. Therefore, the initial set of particles is randomly scattered accross the entire area.
+* **Batch Update:** In Batch Mode the EKF performs one update step for all measurements available at a certain timestep. Thus, the influence of bad measurements can be reduced and more robust updates can be performed. 
+* **Sequential Update:** Using the sequential update, the state estimate is updated for each new measurement coming in. In case of noisy measurements, this can easily lead to an inconsistent estimate of the robot's location. However, the sequential update comes at a reduce computational complexity in comparison to the batch update.
 
 #### Simulation Parameters
-* **Number of Particles:** The number of particles can be varied between 10 and 10.000 particles. While tracking problems can already work with a comparably small number of particles, global localization requires a large number of particles in order to ensure the presence of particles in all areas of relevant likelihood.
-* **Sampling Strategy:** In order to track all relevant hypotheses and ensure the effective contribution of all particles, resampling the set of particles at each iteration. Two different options are available that differ with regard to how the new set of particles is selected. Furthermore, the option to not resample the particles at all is provided for illustative purposes.
-* **Uncertainties:** The underlying models of the sensor modalities and the robot motion are based on the assumption of normally distributed noise with zero mean. The standard deviation of the distributions can be adapted to the circumstances during the simulation. For example, a global localization problem usually requires larger uncertainties in the sensor model in order to allow for a multimodal particle distribution that can track several hypotheses.
+* **Uncertainties:** The underlying models of the sensor modalities and the robot motion are based on the assumption of normally distributed noise with zero mean. The standard deviation of the distributions can be adapted to the circumstances during the simulation. The relation between the uncertainties of the motion model and the sensor model influence the *Kalman Gain* which determines how much the update is influenced by the odometry information and sensor information, respectively. Consequently, it is important to properly assess the uncertainties required for specific tracking problems.
 * **Data Association:** Data Association is concerned with assigning the available laser readings to the corresponding landmark. This step is performed by computing the likelihood of every landmark for all available measurements based on the underlying sensor model and selecting the maximum likelihood association. By disabling the data association, ground truth information about the correct landmark is used instead of calculating the likelihoods. Thus, the performance of the Particle Filter can be assessed under perfect sensory conditions.
-* **Outlier Detection:** In case of noisy measurements or false observations, it can be beneficial to disregard certain measurements in the update step. This step is referred to as outlier detection. The threshold for the detection is based on the average likelihood of a measurement accross all particles. The threshold can be varied between 0 (outlier detection disabled) and 30.
+* **Outlier Detection:** In case of noisy measurements or false observations, it can be beneficial to disregard certain measurements in the update step. This step is referred to as outlier detection. The threshold for the detection is based on the mahalanobis distance of the predicted measurement and the actual measurement. Since the mahalanobis distance follows the inverse Chi-Square distribution the threshold can be given in terms of a probability. It can be interpreted as the fraction of worst measurements available that is discarded in the update step.
 
 
 ## How-To Use the Simulator
