@@ -82,8 +82,8 @@ function run_simulation(app, root, simulationfile)
         [mu, sigma, measurement_info] = ekf_localization(mu, sigma, u, z, association_ground_truth);
         
         % get measurement statistics from EKF
-        outliers = sum(find(measurement_info == 2));
-        misassociations = sum(find(measurement_info == 1));
+        outliers = length(find(measurement_info == 2));
+        misassociations = length(find(measurement_info == 1));
         total_outliers = total_outliers + outliers;
         total_measurements = total_measurements + n_measurements;
         total_misassociations = total_misassociations + misassociations;
