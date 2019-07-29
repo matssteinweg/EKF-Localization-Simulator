@@ -44,9 +44,9 @@ function init_app(app, root, mapfile, dataset_id)
         default_lambda_m = chi2inv(default_delta_m, 2);
     % Dataset 2
     elseif dataset_id == 2
-        default_R = [0.01^2, 0, 0; 0, 0.01^2, 0; 0, 0, 0.01^2];
-        default_Q = [0.2^2, 0; 0, 0.2^2];
-        default_delta_m = 0.95; 
+        default_R = [0.01^2, 0, 0; 0, 0.01^2, 0; 0, 0, (2*pi/360)^2];
+        default_Q = [0.15^2, 0; 0, (8*2*pi/360)^2];
+        default_delta_m = 0.80; 
         default_lambda_m = chi2inv(default_delta_m, 2);
     % Dataset 3
     elseif dataset_id == 3
