@@ -41,16 +41,25 @@ The simulator comes with three datasets specifically designed for testing robot 
 
 ### Dataset 1
 
-
+The first dataset comes with an environment that is fairly easy to navigate. There is a large number of observable landmarks which are sufficiently far away from each other in order not to lead to misassociations. Furthermore, highly accurate sensor readings are available. Consequently, the default settings for the uncertainties in motion model and sensor model are comparably small. The outlier detection is set to only discard highly inaccurate observations. With these settings the robot can be tracked highly accurately accross the whole trajectory. A screenshot of the simulation is displayed in the figure below. We can observe that despite realtively inaccurate odometry information (blue), the large number of observations allow for an accurate estimate of the robot pose with a high certainty.
 
 <p align="center"> 
-<img height="200px" src="/images/dataset_1_illustration.png">
+<img height="250px" src="/images/dataset_1_illustration.png">
 </p>
 
 ### Dataset 2
 
-The second dataset is highly similar to the first one. However, one additional fifth landmark exists that breaks the symmetry of the environment. Thus, contrary to the first dataset, the global localization problem can turn into a tracking problem the moment the robot observes the fifth measurement that allows the robot to uniquely identify its position. The process of the global localization problem is display in the figure below. On the left image we can observe that we start with an initial set of five valid hypotheses since the robot only observes a single landmark in the beginning that as far as the algorithm knows could be any of the five present landmarks. This situation changes the moment the robot gets two valid measurements at the same time. This situation can be observed in the middle image and is analogous to the scenario of four valid hypotheses discussed for the first dataset. Theses hypotheses are tracked accurately until the robot comes within range of the fifth landmark. The moment the first measurement corresponding to the symmetric-breaking landmark is processed, the robot's loclation can be uniquely identified and all particles are re-sampled to the robot's location from which the robot can be tracked accurately for the rest of its trajectory.
+The second dataset is designed to test the outlier detection. The environment consists of ten landmarks that are arranged in the form on an ellipse. Compared to the first dataset, the distance between the two measurements is substantially longer. This simpifies the data association. However, the landmarks are so far apart, that the robot occasionally only observes one measurement at a time. Furthermore, the sensor readings display much greater variance compared to the first dataset. Consequently, the algorithm has to deal with very few and inaccurate observations, requiring a much larger sensor model uncertainty in the default settings. Thus, the filter update relies much more heavily on the motion model than the sensor readings. The figure below displays two scenarios taken from a simulation. In the left image we can observe a situation in which both available measurements are regarded as outliers (yellow lines) due to the offset between the beam endpoint and the location of the landmark. Consequently, the EKF performs the update only based on the odometry information.
+In the right image a scenario is displayed in which the robot only observes one landmark. This situation is undesirable since the algorithm has to rely on merely one, potentially inaccurate sensor reading and cannot incorporate any measurement in the update step in case this observation is classified as an outlier.
 
 <p align="center"> 
 <img height="200px" src="/images/dataset_2_illustration.png">
+</p>
+
+### Dataset 3
+
+In contrast to the two first dataset, the third dataset doesn't contain odometry information and the localization has to be performed purely based on the measurements of the laser range finder. The layout of the environment is highly similar to the second dataset. However, a much larger number of landmarks exist. The purpose of this dataset is to illustrate the advantages of the batch update compared to the sequential update. In order to account for the missing odometry information, the underlying motion model is subject to a large uncertainty on all state dimensions. The outlier detection is disabled in order to incorporate all available sensor information into the state estimate. Scenarios taken from two simulations are displayed in the figure below. The left image is taken from a simulation performing sequential state updates while the image on the right features a simulation based on batch updates. In the left image we can observe that the EKF loses track of the robot very early in the simulation. This can be explained by the shortcomings of the sequential update and the layout of the network. With an update based on an incorrect association, the state estimate is off and cannot recover due to the equally spaced landmarks across the area. Subsequent observations are constantly associated to the wrong landmark, however, display a high likelihood due to the presence of a different landmark at the expected location. This problem is adressed by the batch update that introduces more robustness into the estimate. The filter is updated less frequently but makes more reasonable update steps.
+
+<p align="center"> 
+<img height="200px" src="/images/dataset_3_illustration.png">
 </p>
